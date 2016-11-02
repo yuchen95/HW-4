@@ -1,0 +1,69 @@
+---
+title: "MATH 216 Homework 4"
+author: "WRITE YOUR NAME HERE"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    smooth_scroll: false
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Suggested packages; feel free to use more!
+library(tidyverse)
+library(USAboundaries)
+library(maptools)
+library(sp)
+library(broom)
+```
+
+
+
+## Admistrative:
+
+Please indicate
+
+* Who you collaborated with:
+* Roughly how much time you spent on this HW so far:
+* The URL of the RPubs published URL [here](https://www.nhl.com/).
+* What gave you the most trouble:
+* Any comments you have:
+
+
+
+## Question 1:
+
+**Question**:  DHL, a German shipping company, has a ton of money to build a
+shipping hub in the United States. Where should they build it?
+
+**Deliverable**: A choropleth map of the lower 48 states (no Puerto Rico) where
+the color corresponds to the distance of the given area to the shipping hub,
+which is marked on the map with a large red dot.
+
+```{r, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Perform your computations here:
+
+```
+
+
+```{r, eval=FALSE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Here is a template of a ggplot call; feel free to change this to suit your
+# needs. Once your computations above are complete, set the eval=TRUE on the
+# line above to tell R Markdown to run this code block.
+ggplot(data=geo_data, aes(x=long, y=lat, group=group, fill=distance)) +
+  # Plot choropleth polygons, low -> high being colored white -> dark green
+  geom_polygon() +
+  scale_fill_gradient(low="white", high="darkgreen") + 
+  # Trace outlines of areas
+  geom_path(size=0.1) +
+  # Mark hub
+  annotate("point", x=hub_x_coord, y=hub_y_coord, col="red", size=5) +
+  # Correct aspect ratio for map
+  coord_map()
+```
+
+
+
+
+
