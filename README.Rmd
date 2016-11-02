@@ -37,15 +37,15 @@ homework.
 
 ## Tips
 
-* Use the 2010 Census data; missing data should not be a problem
-except for [Fairfax County, Virginia](http://www.census.gov/quickfacts/table/PST045215/51059)
-with FIPS Code 51059.
-* One-dimensional [center of mass](http://hyperphysics.phy-astr.gsu.edu/hbase/imgmec/cm.gif)
-* To get the [centroid](https://en.wikipedia.org/wiki/Centroid) of a 
-`SpatialPolygons` class object in R, use `sp::coordinates()` which returns a
-matrix where the first column is longitude and the second is latitude. You can
-assume that the order of the centroids matches the order of `counties_sp@data`
-in the example below:
+* Use 2010 Census data; missing data should not be a problem except for [Fairfax
+County, Virginia](http://www.census.gov/quickfacts/table/PST045215/51059) with
+FIPS Code 51059.
+* One-dimensional [center of mass](http://hyperphysics.phy-astr.gsu.edu/hbase/imgmec/cm.gif).
+* To get the [centroids](https://en.wikipedia.org/wiki/Centroid) of all `n`
+polygons in a `SpatialPolygons` class object in R use `sp::coordinates()`, which
+returns a `2 x n` matrix where the first column is longitude and the second is
+latitude. You can assume that the order of the centroids matches the order of
+`counties_sp@data` in the example below:
 
 ```{r}
 library(USAboundaries)
