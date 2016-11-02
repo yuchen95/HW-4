@@ -43,7 +43,7 @@ FIPS Code 51059.
 * One-dimensional [center of mass](http://hyperphysics.phy-astr.gsu.edu/hbase/imgmec/cm.gif).
 * To get the [centroids](https://en.wikipedia.org/wiki/Centroid) of all `n`
 polygons in a `SpatialPolygons` class object in R use `sp::coordinates()`, which
-returns a `2 x n` matrix where the first column is longitude and the second is
+returns a `n x 2` matrix where the first column is longitude and the second is
 latitude. You can assume that the order of the centroids matches the order of
 `counties_sp@data` in the example below:
 
