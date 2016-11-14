@@ -1,6 +1,6 @@
 ---
 title: "MATH 216 Homework 4"
-author: "WRITE YOUR NAME HERE"
+author: "Yuchen Zhu"
 output:
   html_document:
     toc: true
@@ -25,9 +25,9 @@ library(broom)
 Please indicate
 
 * Who you collaborated with:
-* Roughly how much time you spent on this HW so far:
-* The URL of the RPubs published URL [here](https://www.nhl.com/).
-* What gave you the most trouble:
+* Roughly how much time you spent on this HW so far: 4
+* The URL of the RPubs published URL [here](http://rpubs.com/ZhuYuchen/HW-4).
+* What gave you the most trouble: coming up with a metrics to determine how good a place is as a shipping hub
 * Any comments you have:
 
 
@@ -42,16 +42,69 @@ the color corresponds to the distance of the given area to the shipping hub,
 which is marked on the map with a large red dot.
 
 ```{r, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
-# Perform your computations here:
+# county-level map
+counties_shp <- us_counties()
+counties_data <- counties_shp@data
+centroids <- coordinates(counties_shp)
 
+counties_data <- cbind(counties_data, centroids)
+colnames(counties_data)[11] <- "clongitude"
+colnames(counties_data)[12] <- "clatitude"
+
+counties_polygon <- tidy(counties_shp, region="geoid")
+
+counties <- left_join(counties_polygon, counties_data, by=c("id"="geoid"))
+
+counties <- counties %>%
+  filter( !state_name %in% c("Alaska", "Hawaii", "Puerto Rico"))
+
+map <- ggplot(counties, aes(x=long, y=lat, group=group)) +
+        geom_path(size = 0.1) +
+        coord_map()
+map
 ```
 
 
-```{r, eval=FALSE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
-# Here is a template of a ggplot call; feel free to change this to suit your
-# needs. Once your computations above are complete, set the eval=TRUE on the
-# line above to tell R Markdown to run this code block.
-ggplot(data=geo_data, aes(x=long, y=lat, group=group, fill=distance)) +
+```{r, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Perform your computations here:
+# 1. How to select the hub's location (center of mass, population, infrastructure, tax, labor force, competition)
+
+# - join population by county
+PEP_2012_PEPANNRES_with_ann <- read_csv("~/Desktop/Fall 2016/MATH 216/HW-4/PEP_2012_PEPANNRES_with_ann.csv")
+
+counties_pop <- PEP_2012_PEPANNRES_with_ann %>% 
+  select(GEO.id2, rescen42010)
+colnames(counties_pop)[1] <- "geoid"
+colnames(counties_pop)[2] <- "population"
+
+counties_data <- counties_data %>% 
+  left_join(counties_pop, by="geoid") %>% 
+  filter( !state_name %in% c("Alaska", "Hawaii", "Puerto Rico"))
+
+# - find population center using center of mass (mass as population)
+weighted_coord <- counties_data %>% 
+  select(name, state_name, population, clongitude, clatitude) %>% 
+  mutate(population = as.numeric(population)) %>% 
+  mutate(clong_wgt = population*clongitude) %>% 
+  mutate(clat_wgt = population*clatitude)
+
+hub_x_coord <- sum(weighted_coord$clong_wgt)/sum(weighted_coord$population)
+hub_y_coord <- sum(weighted_coord$clat_wgt)/sum(weighted_coord$population)
+
+# - Population Center
+c(hub_x_coord, hub_y_coord)
+
+# 2. How to calculate distance (factor in direct distance, transportation convenience?)
+counties_dist <- counties_data %>% 
+  mutate(distance = sqrt((abs(clongitude)-abs(hub_x_coord))^2 
+                         + (abs(clatitude)-abs(hub_y_coord))^2)
+  ) %>% 
+  select(geoid, population, distance)
+
+counties <- left_join(counties, counties_dist, by=c("id" = "geoid"))
+
+# 3. How to best graph: color, interactive, etc.
+ggplot(data=counties, aes(x=long, y=lat, group=group, fill=distance)) +
   # Plot choropleth polygons, low -> high being colored white -> dark green
   geom_polygon() +
   scale_fill_gradient(low="white", high="darkgreen") + 
@@ -62,6 +115,10 @@ ggplot(data=geo_data, aes(x=long, y=lat, group=group, fill=distance)) +
   # Correct aspect ratio for map
   coord_map()
 ```
+
+The population center I identified is -91.64791, 37.55090, which is the junciton of County Roads 647 and 608. It is within one-hour driving distance from Plato, MO, which is the official population center of the US accoridng to the 2010 census. The bias is reasonable since I used centroids of counties to calculate the population center of the US.
+
+Since it is in the middle of nowhere, we also need to consider the population size & density, labor force size, and transportation infrastructure. An ideal shipping hub location should not only be close to the population center but also have sufficient infrastructure such as airport and empoyeable people.
 
 
 

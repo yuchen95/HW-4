@@ -8,3 +8,4 @@
 *_files/*
 /rsconnect/*
 profiles.csv
+.httr-oauth
